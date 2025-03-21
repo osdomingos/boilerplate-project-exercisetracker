@@ -29,30 +29,18 @@ let User = mongoose.model("User", userSchema);
 // Post para novo usuário
 app.post('/api/users', async (req, res) => {
   let username = req.body.username;
-
+  
   try {
-    if (!await findByName(username)) {
-          const newUser = await saveNewUser(username);
+    let foundUser = await User.findOne({ username });
+    if (!foundUser) {
+      foundUser = await new User({ username }).save();
     }
-    const foundUser = await findByName(username);
 
-    res.json(foundUser);
+    res.json({ username: foundUser.username, _id: foundUser._id });
   } catch (err) {
-    res.status(500).json({ error: err });
+    res.status(500).json({ error: err.message });
   }
-})
-
-// Salvar novo usuário no MongoDB
-const saveNewUser = async (user) => {
-  const newUser = new User({ username: user })
-  return await newUser.save();
-
-}
-
-// Achar pessoa por nome
-const findByName = async (user) => {
-  return await User.findOne({ username: user })
-}
+});
 
 /*
 // Definição do Schema Exercise
