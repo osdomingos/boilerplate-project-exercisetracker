@@ -43,25 +43,29 @@ app.get('/api/users', (req, res) => {
 
 // Postar exercícios
 app.post('/api/users/:id/exercises' , (req, res) => {
-  let id = String(req.params.id);
-  console.log(id);
+  let id = req.params.id;
+  console.log(1, id);
   let usuario;
   let date = !req.body.date ? new Date().toDateString() : req.body.date.toDateString();
-  console.log(date);
-  console.log(listaDeUsers[0]._id);
+  console.log(2, date);
+  console.log(3, listaDeUsers[0]._id);
   for (let i = 0; i < listaDeUsers.length; i++) {
-    console.log(listaDeUsers[i]);
-    if (listaDeUsers[i]._id == id) return usuario = listaDeUsers[i]
+    console.log(4, listaDeUsers[i]);
+    if (id == listaDeUsers[i]._id) {
+      console.log(5, 'entrou')
+      usuario = listaDeUsers[i];
+    }
   }
-  console.log(usuario);
+  console.log(6, usuario);
   usuario.exercise = {
     username: usuario.username,
     description: String(req.body.description),
     duration: Number(req.body.duration),
-    date: date
+    date: date,
+    _id: usuario._id
   };
-  console.log(usuario.exercise);
-  res.json(usuario);
+  console.log(7, usuario.exercise);
+  res.json(usuario.exercise);
 });
 
 
