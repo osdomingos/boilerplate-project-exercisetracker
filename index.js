@@ -65,7 +65,7 @@ app.post('/api/users/:id/exercises' , (req, res) => {
     _id: usuario._id
   };
   console.log(7, usuario.exercise);
-  res.json(usuario.exercise);
+  res.json(usuario);
 });
 
 
