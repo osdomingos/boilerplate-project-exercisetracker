@@ -14,6 +14,9 @@ app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
 
+// Vars e listas
+let listaDeUsers = [];
+
 // Criar User class
 class User {
   constructor(username) {
@@ -26,7 +29,14 @@ class User {
 app.post('/api/users', (req, res) => {
   let username = req.body.username;
   let user = new User(username);
-  res.json({ _id: user._id, username: user.username });
+  let userObjct = { _id: user._id, username: user.username };
+  listaDeUsers.push(userObjct )
+  res.json(userObjct);
+});
+
+// Ver uma lista de usuários
+app.get('/api/users', (req, res) => {
+  res.json(listaDeUsers)
 });
 
 
