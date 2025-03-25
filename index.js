@@ -5,7 +5,7 @@ require('dotenv').config()
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
-mongoose.connect(process.env.MONGO_URI);
+mongoose.connect(String(process.env.MONGO_URI));
 
 app.use(cors())
 app.use(express.static('public'))
@@ -20,6 +20,13 @@ const userSchema = new mongoose.Schema({
 }, { versionKey: false });
 
 let User = mongoose.model("User", userSchema);
+
+const exerciseSchema = new mongoose.Schema({
+  username: { type: String, required: true },
+  description: { type: String, required: true },
+  duration: { type: Number, required: true },
+  date: Date
+})
 
 app.post('/api/users', async (req, res) => {
   const username = req.body.username;
