@@ -22,10 +22,16 @@ const userSchema = new mongoose.Schema({
 let User = mongoose.model("User", userSchema);
 
 app.post('/api/users', async (req, res) => {
+  const username = req.body.username;
+  const user = await User.findOne({ username: username });
+  let data;
   try {
+    if (!user) {
     const newUser = new User({ username: req.body.username });
-    const data = await newUser.save();
-    res.json(data);
+    data = await newUser.save();
+    return res.json(data);
+    }
+    return res.json(user);
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Internal Server Error' });
