@@ -40,13 +40,18 @@ app.post('/api/users', async (req, res) => {
     if (!user) {
     const newUser = new User({ username: req.body.username });
     data = await newUser.save();
-    return res.json(data);
+    return res.json({ username: data.username, _id: data._id });
     }
-    return res.json(user);
+    return res.json({ username: user.username, _id: user._id });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+})
+
+app.post('/api/users/:id/exercises', async (req, res) => {
+  const id = req.params.id;
+
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
