@@ -35,14 +35,13 @@ let exercise = mongoose.model("Exercise", exerciseSchema);
 app.post('/api/users', async (req, res) => {
   const username = req.body.username;
   const user = await User.findOne({ username: username });
-  let data;
+  let data = user;
   try {
     if (!user) {
     const newUser = new User({ username: req.body.username });
     data = await newUser.save();
-    return res.json({ username: data.username, _id: data._id });
     }
-    return res.json({ username: user.username, _id: user._id });
+    res.json({ username: data.username, _id: data._id.toString() });
   } catch (err) {
     console.log(err);
     res.status(500).json({ error: 'Internal Server Error' });
