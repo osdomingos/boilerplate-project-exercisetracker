@@ -27,10 +27,10 @@ const exerciseSchema = new mongoose.Schema({
   username: { type: String, required: true },
   description: { type: String, required: true },
   duration: { type: Number, required: true },
-  date: Date
-})
+  date: { type: Date }
+}, { versionKey: false })
 
-let exercise = mongoose.model("Exercise", exerciseSchema);
+let Exercise = mongoose.model("Exercise", exerciseSchema);
 
 app.post('/api/users', async (req, res) => {
   const username = req.body.username;
@@ -38,8 +38,8 @@ app.post('/api/users', async (req, res) => {
   let data = user;
   try {
     if (!user) {
-    const newUser = new User({ username: req.body.username });
-    data = await newUser.save();
+      const newUser = new User({ username: req.body.username });
+      data = await newUser.save();
     }
     res.json({ username: data.username, _id: data._id.toString() });
   } catch (err) {
@@ -60,7 +60,30 @@ app.get('/api/users', async (req, res) => {
 
 app.post('/api/users/:id/exercises', async (req, res) => {
   const id = req.params.id;
-
+  const description = req.body.description;
+  const duration = req.body.duration;
+  const date = req.body.date ? new Date(req.body.date) : new Date();
+  const user = await User.findById(id);
+  try {
+    const newExercise = new Exercise({
+      username: user.username,
+      description: description,
+      duration: duration,
+      date: date,
+      _id: user._id.toString()
+    });
+    const data = await newExercise.save();
+    res.json({
+      username: data.username,
+      description: data.description,
+      duration: data.duration,
+      date: data.date.toISOString().split('T')[0],
+      _id: data._id
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
