@@ -5,7 +5,9 @@ require('dotenv').config()
 const mongoose = require('mongoose');
 const AutoIncrement = require('mongoose-sequence')(mongoose);
 
-mongoose.connect(String(process.env.MONGO_URI));
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch(err => console.error('Failed to connect to MongoDB:', err));
 
 app.use(cors())
 app.use(express.static('public'))
@@ -27,6 +29,8 @@ const exerciseSchema = new mongoose.Schema({
   duration: { type: Number, required: true },
   date: Date
 })
+
+let exercise = mongoose.model("Exercise", exerciseSchema);
 
 app.post('/api/users', async (req, res) => {
   const username = req.body.username;
