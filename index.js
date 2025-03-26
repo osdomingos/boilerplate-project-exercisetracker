@@ -32,6 +32,14 @@ const exerciseSchema = new mongoose.Schema({
 
 let Exercise = mongoose.model("Exercise", exerciseSchema);
 
+const logSchema = new mongoose.Schema({
+  username: { type: String, required: true },
+  log: [],
+  count: Number
+}, { versionKey: false })
+
+let Log = mongoose.model("Log", logSchema);
+
 app.post('/api/users', async (req, res) => {
   const username = req.body.username;
   const user = await User.findOne({ username: username });
@@ -59,20 +67,22 @@ app.get('/api/users', async (req, res) => {
 })
 
 app.post('/api/users/:id/exercises', async (req, res) => {
+  let logCount = 1;
   const id = req.params.id;
   const description = req.body.description;
   const duration = req.body.duration;
   const date = req.body.date ? new Date(req.body.date) : new Date();
   const user = await User.findById(id);
   try {
+
     const newExercise = new Exercise({
       username: user.username,
       description: description,
       duration: duration,
-      date: date,
-      _id: user._id.toString()
+      date: date
     });
     const data = await newExercise.save();
+
     res.json({
       username: data.username,
       description: data.description,
@@ -82,8 +92,62 @@ app.post('/api/users/:id/exercises', async (req, res) => {
     });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(500).json({ error: 'Internal Server Error: Exercises' });
   }
+
+  try {
+    console.log('tentando aqui')
+    let newLog;
+    console.log(user.username)
+    const logado = await Log.findOne({ username: user.username});
+    console.log(logado)
+    if (!logado) {
+      console.log('Log criado')
+      newLog = new Log({
+        username: user.username,
+        log: [{
+            description: description,
+            duration: duration,
+            date: date.toISOString().split('T')[0]
+          }],
+          count: 1
+      })
+      await newLog.save();
+    } else {
+      console.log('Tentando adicionar exercício')
+      logado.log.push({
+        description: description,
+        duration: duration,
+        date: date.toISOString().split('T')[0]
+      });
+      logado.count++;
+      await logado.save();
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: 'Internal Server Error: Logs' });
+  }
+})
+
+app.get('/api/:id/logs', async (req, res) => {
+  const id = req.params.id;
+  const from = req.params.from;
+  const to = req.params.to;
+  const limit = req.params.limit;
+
+  const user = await User.findById(id);
+  const log = await Log.findOne({ username: user.username })
+
+  console.log('\n\n')
+  console.log(user)
+  console.log(log)
+  console.log('\n\n')
+
+  res.json({ username: log.username,
+    count: log.count,
+    _id: id.toString(),
+    log: log.log
+    })
 })
 
 const listener = app.listen(process.env.PORT || 3000, () => {
