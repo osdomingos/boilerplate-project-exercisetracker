@@ -129,7 +129,7 @@ app.post('/api/users/:id/exercises', async (req, res) => {
   }
 })
 
-app.get('/api/:id/logs', async (req, res) => {
+app.get('/api/users/:id/logs', async (req, res) => {
   const id = req.params.id;
   const from = req.params.from;
   const to = req.params.to;
